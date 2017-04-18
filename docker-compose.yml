@@ -1,0 +1,14 @@
+mysql:
+  image: mysql
+  ports:
+    - "3306:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=root
+    - MYSQL_DATABASE=test
+  volumes:
+    - "./conf.d:/etc/mysql/conf.d:ro"
+
+# mysql -h 127.0.0.1 -P 3306 -u root -p
+# mysql -h 127.0.0.1 -u root -p < src/main/resources/db/mysql/schema.sql
+# mysql petclinic -h 127.0.0.1 -u root -p < src/main/resources/db/mysql/data.sql
+
