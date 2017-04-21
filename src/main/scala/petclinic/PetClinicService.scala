@@ -12,7 +12,7 @@ trait PetClinicService {
   def route[F[_]: Monad](
       implicit petRepo: PetRepo[F],
       ownerRepo: OwnerRepo[F],
-      petTypesMarsh: ToResponseMarshaller[F[Seq[PetType]]],
+      petTypesMarsh: ToResponseMarshaller[F[List[PetType]]],
       petMarsh: ToResponseMarshaller[F[PetInfo]]): Route =
     pathPrefix("petTypes") {
       pathEndOrSingleSlash {
@@ -24,9 +24,9 @@ trait PetClinicService {
     pathPrefix("pet" / IntNumber) { petId =>
       pathEndOrSingleSlash {
         get {
-          val petInfo =
+         val petInfo =
             petRepo.findById(petId).flatMap { pet =>
-              val owner = ownerRepo.findById(pet.ownerId)
+              val owner   = ownerRepo.findById(pet.ownerId)
               val petType = petRepo.findPetTypeById(pet.petTypeId)
               (petType, owner).map2(PetInfo(pet, _, _))
             }

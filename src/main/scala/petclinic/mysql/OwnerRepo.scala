@@ -4,7 +4,7 @@ package mysql
 import scala.concurrent.{ ExecutionContext, Future }
 import java.sql.SQLException
 
-final case class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo[Future] {
+final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo[Future] {
   def findById(id: Int): Future[Owner] =
     withConnection { conn =>
       val sql =
@@ -30,5 +30,5 @@ final case class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.Owne
 
   def save(owner: Owner): Future[Unit] = ???
 
-  def findByLastName(lastName: String): Future[Seq[Owner]] = ???
+  def findByLastName(lastName: String): Future[List[Owner]] = ???
 }

@@ -13,8 +13,7 @@ object Main {
     implicit val system       = ActorSystem("petclinic-as")
     implicit val materializer = ActorMaterializer()
     implicit val ec           = system.dispatcher
-    val bindingFuture =
-      Http().bindAndHandle(PetClinicService.route[Future], "localhost", 8080)
+    Http().bindAndHandle(PetClinicService.route[Future], "localhost", 8080)
     println(s"Server online at http://localhost:8080/")
   }
 }

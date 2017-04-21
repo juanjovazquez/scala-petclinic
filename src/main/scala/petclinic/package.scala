@@ -2,8 +2,8 @@ import io.circe.{ Encoder, Json }
 import java.util.Date
 
 package object petclinic {
-  type Seq[+A] = scala.collection.immutable.Seq[A]
-  val Seq = scala.collection.immutable.Seq
+  //type Seq[+A] = scala.collection.immutable.Seq[A]
+  //val Seq = scala.collection.immutable.Seq
   type Vet = Person
 
   // circe

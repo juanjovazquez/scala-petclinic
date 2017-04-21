@@ -9,7 +9,7 @@ sealed trait Repo[A, F[_]] {
 }
 
 trait OwnerRepo[F[_]] extends Repo[Owner, F] {
-  def findByLastName(lastName: String): F[Seq[Owner]]
+  def findByLastName(lastName: String): F[List[Owner]]
 }
 
 object OwnerRepo {
@@ -20,7 +20,7 @@ object OwnerRepo {
 }
 
 trait PetRepo[F[_]] extends Repo[Pet, F] {
-  def findPetTypes: F[Seq[PetType]]
+  def findPetTypes: F[List[PetType]]
   def findPetTypeById(petTypeId: Int): F[PetType]
 }
 
@@ -32,7 +32,7 @@ object PetRepo {
 }
 
 trait VetRepo[F[_]] extends Repo[Vet, F] {
-  def findAll: F[Seq[Vet]]
+  def findAll: F[List[Vet]]
 }
 
 object VetRepo {
@@ -40,5 +40,5 @@ object VetRepo {
 }
 
 trait VisitRepo[F[_]] extends Repo[Visit, F] {
-  def findByPetId(petId: Int): F[Seq[Visit]]
+  def findByPetId(petId: Int): F[List[Visit]]
 }

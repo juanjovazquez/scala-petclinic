@@ -40,7 +40,7 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
         throw new SQLException(s"PetType with id $petTypeId not found")
     }
 
-  def findPetTypes: Future[Seq[PetType]] =
+  def findPetTypes: Future[List[PetType]] =
     withConnection { conn =>
       val buffer    = new ListBuffer[PetType]
       val statement = conn.createStatement()
