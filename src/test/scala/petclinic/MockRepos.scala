@@ -2,7 +2,7 @@ package petclinic
 
 import cats.Id
 import scala.collection.SortedMap
-p
+
 trait MockRepos {
 
   implicit val petRepo: PetRepo[Id] =
@@ -23,7 +23,7 @@ trait MockRepos {
       def findByLastName(lastName: String): List[Owner] = ???
     }
 
-  private implicit def toDate(s: String): java.util.Date = {
+  implicit def toDate(s: String): java.util.Date = {
     val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
     format.parse(s)
   }

@@ -24,7 +24,7 @@ trait PetClinicService {
     pathPrefix("pet" / IntNumber) { petId =>
       pathEndOrSingleSlash {
         get {
-         val petInfo =
+          val petInfo =
             petRepo.findById(petId).flatMap { pet =>
               val owner   = ownerRepo.findById(pet.ownerId)
               val petType = petRepo.findPetTypeById(pet.petTypeId)

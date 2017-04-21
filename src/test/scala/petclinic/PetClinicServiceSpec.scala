@@ -29,7 +29,20 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
     }
     "return a pet by id" in {
       Get("/pet/1") ~> route ~> check {
-
+        status shouldBe StatusCodes.OK
+        contentType shouldBe `application/json`
+        entityAs[PetInfo] shouldBe PetInfo(
+          Pet(1, "Leo", "2000-09-07", 1, 1),
+          PetType(1, "cat"),
+          Owner(
+            1,
+            "George Franklin",
+            "George",
+            "Franklin",
+            "110 W. Liberty St.",
+            "Madison",
+            "6085551023")
+        )
       }
     }
   }
