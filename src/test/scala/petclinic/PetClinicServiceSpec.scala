@@ -28,6 +28,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
           PetType(6, "hamster"))
       }
     }
+
     "return a pet by id" in {
       Get("/pet/1") ~> route ~> check {
         status shouldBe StatusCodes.OK
@@ -44,6 +45,21 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
             "Madison",
             "6085551023")
         )
+      }
+    }
+
+    "return an owner by id" in {
+      Get("/owner/1") ~> route ~> check {
+        status shouldBe StatusCodes.OK
+        contentType shouldBe `application/json`
+        entityAs[Owner] shouldBe Owner(
+          1,
+          "George Franklin",
+          "George",
+          "Franklin",
+          "110 W. Liberty St.",
+          "Madison",
+          "6085551023")
       }
     }
   }

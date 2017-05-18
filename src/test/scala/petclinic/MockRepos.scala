@@ -1,7 +1,7 @@
 package petclinic
 
 import cats.data.State
-import cats.data.State.get
+import cats.data.State.{ get, modify }
 
 trait MockRepos extends Data {
 
@@ -16,7 +16,12 @@ trait MockRepos extends Data {
       def findPetTypeById(petTypeId: Int): State[DB, PetType] =
         get.map(_.petTypes(petTypeId))
 
-      def save(entity: Pet): State[DB, Unit] = ???
+      def save(pet: Pet): State[DB, Unit] =
+        modify { db =>
+          db.copy(
+            pets = db.pets + (pet.id -> pet)
+          )
+        }
     }
 
   implicit val ownerRepo: OwnerRepo[State[DB, ?]] =
@@ -24,7 +29,14 @@ trait MockRepos extends Data {
       def findById(id: Int): State[DB, Owner] =
         get.map(_.owners(id))
 
-      def findByLastName(lastName: String): State[DB, List[Owner]] = ???
-      def save(entity: Owner): State[DB, Unit]                     = ???
+      def findByLastName(lastName: String): State[DB, List[Owner]] =
+        get.map(_.owners.values.filter(_.lastName == lastName).toList)
+
+      def save(owner: Owner): State[DB, Unit] =
+        modify { db =>
+          db.copy(
+            owners = db.owners + (owner.id -> owner)
+          )
+        }
     }
 }
