@@ -1,19 +1,20 @@
 package petclinic
 
-import akka.http.scaladsl.marshalling.ToResponseMarshaller
+import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import cats.Monad
 import cats.implicits._
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.auto._
 import scala.language.higherKinds
 
-trait PetClinicService {
-  def route[F[_]: Monad](
-      implicit petRepo: PetRepo[F],
-      ownerRepo: OwnerRepo[F],
-      ownerMarsh: ToResponseMarshaller[F[Owner]],
-      petTypesMarsh: ToResponseMarshaller[F[List[PetType]]],
-      petMarsh: ToResponseMarshaller[F[PetInfo]]): Route =
+trait PetClinicService[F[_]] {
+
+  implicit def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[F[A], B]
+  implicit val monadEv: Monad[F]
+
+  def route(implicit petRepo: PetRepo[F], ownerRepo: OwnerRepo[F]): Route =
     pathPrefix("petTypes") {
       pathEndOrSingleSlash {
         get {
@@ -40,7 +41,14 @@ trait PetClinicService {
           complete(ownerRepo.findById(ownerId))
         }
       }
+    } ~
+    pathPrefix("owner") {
+      pathEndOrSingleSlash {
+        post {
+          entity(as[Owner]) { owner =>
+            complete("")
+          }
+        }
+      }
     }
 }
-
-object PetClinicService extends PetClinicService

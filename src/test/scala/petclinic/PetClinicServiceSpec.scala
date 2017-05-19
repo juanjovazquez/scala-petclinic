@@ -1,9 +1,10 @@
 package petclinic
 
+import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.ContentTypes.`application/json`
-import cats.data.State
+import cats.Monad
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import org.scalatest.{ Matchers, WordSpec }
@@ -11,7 +12,11 @@ import petclinic.marshallers._
 
 class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with MockRepos {
 
-  private[this] val route = PetClinicService.route[State[DB, ?]]
+  private[this] val service = new PetClinicService[DBTran] {
+    def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[DBTran[A], B] = implicitly
+    val monadEv: Monad[DBTran]                                                    = implicitly
+  }
+  private[this] val route = service.route
 
   "PetClinicService" should {
     "return the pet types" in {

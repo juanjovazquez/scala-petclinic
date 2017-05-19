@@ -5,18 +5,20 @@ import cats.data.State.{ get, modify }
 
 trait MockRepos extends Data {
 
-  implicit val petRepo: PetRepo[State[DB, ?]] =
-    new PetRepo[State[DB, ?]] {
-      def findById(id: Int): State[DB, Pet] =
+  type DBTran[A] = State[DB, A]
+
+  implicit val petRepo: PetRepo[DBTran] =
+    new PetRepo[DBTran] {
+      def findById(id: Int): DBTran[Pet] =
         get.map(_.pets(id))
 
-      def findPetTypes: State[DB, List[PetType]] =
+      def findPetTypes: DBTran[List[PetType]] =
         get.map(_.petTypes.values.toList)
 
-      def findPetTypeById(petTypeId: Int): State[DB, PetType] =
+      def findPetTypeById(petTypeId: Int): DBTran[PetType] =
         get.map(_.petTypes(petTypeId))
 
-      def save(pet: Pet): State[DB, Unit] =
+      def save(pet: Pet): DBTran[Unit] =
         modify { db =>
           db.copy(
             pets = db.pets + (pet.id -> pet)
@@ -24,15 +26,15 @@ trait MockRepos extends Data {
         }
     }
 
-  implicit val ownerRepo: OwnerRepo[State[DB, ?]] =
-    new OwnerRepo[State[DB, ?]] {
-      def findById(id: Int): State[DB, Owner] =
+  implicit val ownerRepo: OwnerRepo[DBTran] =
+    new OwnerRepo[DBTran] {
+      def findById(id: Int): DBTran[Owner] =
         get.map(_.owners(id))
 
-      def findByLastName(lastName: String): State[DB, List[Owner]] =
+      def findByLastName(lastName: String): DBTran[List[Owner]] =
         get.map(_.owners.values.filter(_.lastName == lastName).toList)
 
-      def save(owner: Owner): State[DB, Unit] =
+      def save(owner: Owner): DBTran[Unit] =
         modify { db =>
           db.copy(
             owners = db.owners + (owner.id -> owner)
