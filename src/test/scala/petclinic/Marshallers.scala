@@ -15,4 +15,4 @@ trait Marshallers {
     })
 }
 
-object marshallers extends Marshallers
+object Marshallers extends Marshallers

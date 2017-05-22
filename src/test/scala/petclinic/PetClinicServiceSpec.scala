@@ -8,13 +8,13 @@ import cats.Monad
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import org.scalatest.{ Matchers, WordSpec }
-import petclinic.marshallers._
+import petclinic.Marshallers._
 
 class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with MockRepos {
 
-  private[this] val service = new PetClinicService[DBTran] {
-    def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[DBTran[A], B] = implicitly
-    val monadEv: Monad[DBTran]                                                    = implicitly
+  private[this] val service = new PetClinicService[DBAction] {
+    def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[DBAction[A], B] = implicitly
+    val monadEv: Monad[DBAction]                                                    = implicitly
   }
   private[this] val route = service.route
 
