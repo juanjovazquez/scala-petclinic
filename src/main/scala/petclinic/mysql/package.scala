@@ -1,9 +1,9 @@
 package petclinic
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
-import java.sql.{ Connection, DriverManager }
+import java.sql.{Connection, DriverManager, SQLException}
 
 package object mysql {
   final val Driver   = "com.mysql.jdbc.Driver"
@@ -26,4 +26,8 @@ package object mysql {
         }
       comp.get
     }
+
+  object SQLException {
+    def apply(msg: String) = new SQLException(msg)
+  }
 }

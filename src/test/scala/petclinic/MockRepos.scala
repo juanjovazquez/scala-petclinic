@@ -18,6 +18,9 @@ trait MockRepos extends Data {
       def findPetTypeById(petTypeId: Int): DBAction[PetType] =
         get.map(_.petTypes(petTypeId))
 
+      def findPetsByOwnerId(ownerId: Int): DBAction[List[Pet]] =
+        get.map(_.pets.values.filter(_.ownerId == ownerId).toList)
+
       def save(pet: Pet): DBAction[Unit] =
         modify { db =>
           db.copy(

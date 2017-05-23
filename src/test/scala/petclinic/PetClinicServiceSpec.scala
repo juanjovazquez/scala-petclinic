@@ -29,7 +29,8 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
           PetType(3, "lizard"),
           PetType(4, "snake"),
           PetType(5, "bird"),
-          PetType(6, "hamster"))
+          PetType(6, "hamster")
+        )
       }
     }
 
@@ -46,7 +47,8 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
             "Franklin",
             "110 W. Liberty St.",
             "Madison",
-            "6085551023")
+            "6085551023"
+          )
         )
       }
     }
@@ -54,14 +56,19 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
     "return an owner by id" in {
       Get("/owner/1") ~> route ~> check {
         checkResponseOk
-        entityAs[Owner] shouldBe Owner(
-          1,
-          "George Franklin",
-          "George",
-          "Franklin",
-          "110 W. Liberty St.",
-          "Madison",
-          "6085551023")
+        entityAs[OwnerInfo] shouldBe
+        OwnerInfo(
+          Owner(
+            1,
+            "George Franklin",
+            "George",
+            "Franklin",
+            "110 W. Liberty St.",
+            "Madison",
+            "6085551023"
+          ),
+          List(Pet(1, "Leo", "2000-09-07", 1, 1))
+        )
       }
     }
 
@@ -77,8 +84,17 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
             "Davis",
             "638 Cardinal Ave.",
             "Sun Prairie",
-            "6085551749"),
-          Owner(4, "Harold Davis", "Harold", "Davis", "563 Friendly St.", "Windsor", "6085553198")
+            "6085551749"
+          ),
+          Owner(
+            4,
+            "Harold Davis",
+            "Harold",
+            "Davis",
+            "563 Friendly St.",
+            "Windsor",
+            "6085553198"
+          )
         )
       }
     }

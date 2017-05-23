@@ -22,6 +22,7 @@ object OwnerRepo {
 trait PetRepo[F[_]] extends Repo[Pet, F] {
   def findPetTypes: F[List[PetType]]
   def findPetTypeById(petTypeId: Int): F[PetType]
+  def findPetsByOwnerId(ownerId: Int): F[List[Pet]]
 }
 
 object PetRepo {
