@@ -49,6 +49,13 @@ trait PetClinicService[F[_]] {
             complete("")
           }
         }
+        get {
+          parameter('lastName.?) { lastName =>
+            val default = monadEv.pure(List.empty[Owner])
+            val owners  = lastName.map(ownerRepo.findByLastName).getOrElse(default)
+            complete(owners)
+          }
+        }
       }
     }
 }

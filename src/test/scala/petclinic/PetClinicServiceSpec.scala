@@ -21,8 +21,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
   "PetClinicService" should {
     "return the pet types" in {
       Get("/petTypes") ~> route ~> check {
-        status shouldBe StatusCodes.OK
-        contentType shouldBe `application/json`
+        checkResponseOk
         entityAs[List[PetType]] shouldBe
         List(
           PetType(1, "cat"),
@@ -36,8 +35,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
 
     "return a pet by id" in {
       Get("/pet/1") ~> route ~> check {
-        status shouldBe StatusCodes.OK
-        contentType shouldBe `application/json`
+        checkResponseOk
         entityAs[PetInfo] shouldBe PetInfo(
           Pet(1, "Leo", "2000-09-07", 1, 1),
           PetType(1, "cat"),
@@ -55,8 +53,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
 
     "return an owner by id" in {
       Get("/owner/1") ~> route ~> check {
-        status shouldBe StatusCodes.OK
-        contentType shouldBe `application/json`
+        checkResponseOk
         entityAs[Owner] shouldBe Owner(
           1,
           "George Franklin",
@@ -67,5 +64,35 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
           "6085551023")
       }
     }
+
+    "return owners by lastName" in {
+      Get("/owner?lastName=Davis") ~> route ~> check {
+        checkResponseOk
+        entityAs[List[Owner]] shouldBe
+        List(
+          Owner(
+            2,
+            "Betty Davis",
+            "Betty",
+            "Davis",
+            "638 Cardinal Ave.",
+            "Sun Prairie",
+            "6085551749"),
+          Owner(4, "Harold Davis", "Harold", "Davis", "563 Friendly St.", "Windsor", "6085553198")
+        )
+      }
+    }
+
+    "return an empty list of owners when the parameter `lastName` is missing" in {
+      Get("/owner") ~> route ~> check {
+        checkResponseOk
+        entityAs[List[Owner]] shouldBe List()
+      }
+    }
+  }
+
+  private[this] def checkResponseOk = {
+    status shouldBe StatusCodes.OK
+    contentType shouldBe `application/json`
   }
 }

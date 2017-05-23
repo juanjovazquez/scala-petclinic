@@ -21,7 +21,7 @@ package object mysql {
         } catch {
           case NonFatal(e) => Failure(e)
         } finally {
-          if (connection != null && !connection.isClosed())
+          if (connection != null && !connection.isClosed)
             connection.close()
         }
       comp.get

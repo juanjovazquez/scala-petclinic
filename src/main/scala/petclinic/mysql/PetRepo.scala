@@ -43,8 +43,9 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
   def findPetTypes: Future[List[PetType]] =
     withConnection { conn =>
       val buffer    = new ListBuffer[PetType]
+      val sql = "select id, name from types"
       val statement = conn.createStatement()
-      val resultSet = statement.executeQuery("select id, name from types")
+      val resultSet = statement.executeQuery(sql)
       while (resultSet.next) {
         buffer +=
           PetType(resultSet.getInt("id"), resultSet.getString("name"))
