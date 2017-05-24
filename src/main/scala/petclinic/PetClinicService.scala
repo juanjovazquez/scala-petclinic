@@ -22,7 +22,7 @@ trait PetClinicService[F[_]] {
         }
       }
     } ~
-    pathPrefix("pet" / IntNumber) { petId =>
+    pathPrefix("pet" / LongNumber) { petId =>
       pathEndOrSingleSlash {
         get {
           val petInfo =
@@ -51,7 +51,7 @@ trait PetClinicService[F[_]] {
         }
       }
     } ~
-    pathPrefix("owner" / IntNumber) { ownerId =>
+    pathPrefix("owner" / LongNumber) { ownerId =>
       pathEndOrSingleSlash {
         get {
           val owner     = ownerRepo.findById(ownerId)

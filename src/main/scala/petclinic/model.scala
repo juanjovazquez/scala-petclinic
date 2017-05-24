@@ -1,7 +1,7 @@
 package petclinic
 
 sealed abstract class BaseEntity extends Product with Serializable {
-  def id: Long
+  def id: Option[Id]
 }
 
 sealed abstract class NamedEntity extends BaseEntity {
@@ -13,11 +13,11 @@ sealed abstract class PersonLike extends NamedEntity {
   def lastName: String
 }
 
-final case class Person(id: Long, name: String, firstName: String, lastName: String)
+final case class Person(id: Option[Id], name: String, firstName: String, lastName: String)
     extends PersonLike
 
 final case class Owner(
-    id: Long,
+    id: Option[Id],
     name: String,
     firstName: String,
     lastName: String,
@@ -26,17 +26,17 @@ final case class Owner(
     telephone: String)
     extends PersonLike
 
-final case class PetType(id: Long, name: String) extends NamedEntity
+final case class PetType(id: Option[Id], name: String) extends NamedEntity
 
 final case class Pet(
-    id: Long,
+    id: Option[Id],
     name: String,
     birthDate: java.util.Date,
-    petTypeId: Long,
-    ownerId: Long)
+    petTypeId: Id,
+    ownerId: Id)
     extends NamedEntity
 
-final case class Speciality(id: Long, name: String) extends NamedEntity
+final case class Speciality(id: Option[Id], name: String) extends NamedEntity
 
-final case class Visit(id: Long, date: java.util.Date, description: String, pet: Pet)
+final case class Visit(id: Option[Id], date: java.util.Date, description: String, pet: Pet)
     extends BaseEntity

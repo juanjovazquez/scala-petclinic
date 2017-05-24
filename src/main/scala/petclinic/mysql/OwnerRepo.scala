@@ -23,7 +23,7 @@ final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo
       resultSet.toEntity[Owner].getOrElse(throw SQLException(s"Owner with id: $id not found"))
     }
 
-  def save(owner: Owner): Future[Unit] =
+  def save(owner: Owner): Future[Long] =
     withConnection { conn =>
       val pst = conn.prepareStatement(InsertOwner, Statement.RETURN_GENERATED_KEYS)
       pst.setString(1, owner.firstName)
@@ -34,8 +34,7 @@ final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo
       pst.executeUpdate()
       val keys = pst.getGeneratedKeys
       keys.next()
-      val id = keys.getLong(1)
-      println(s"id: $id")
+      keys.getLong(1)
     }
 
   def findByLastName(lastName: String): Future[List[Owner]] =

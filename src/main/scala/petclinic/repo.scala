@@ -5,7 +5,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 sealed trait Repo[A, F[_]] {
   def findById(id: Long): F[A]
-  def save(entity: A): F[Unit]
+  def save(entity: A): F[Long]
 }
 
 trait OwnerRepo[F[_]] extends Repo[Owner, F] {

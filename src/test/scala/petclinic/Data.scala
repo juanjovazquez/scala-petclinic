@@ -113,4 +113,7 @@ trait Data {
     val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
     format.parse(s)
   }
+
+  implicit def LongToOption(x: Long): Option[Long] =
+    Some(x)
 }

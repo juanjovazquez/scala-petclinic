@@ -20,7 +20,7 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
       resultSet.toEntity[Pet].getOrElse(throw SQLException(s"Pet with id: $id not found"))
     }
 
-  def save(pet: Pet): Future[Unit] = ???
+  def save(pet: Pet): Future[Long] = ???
 
   def findPetTypeById(petTypeId: Long): Future[PetType] =
     withConnection { conn =>

@@ -105,7 +105,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
       Post(
         "/owner",
         Owner(
-          999,
+          id = None,
           "Sam Schultz",
           "Sam",
           "Schultz",
@@ -114,6 +114,9 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
           "4444444444"
         )) ~> service(initialState) { initialState = _ }.route ~> check {
         checkResponseOk
+        val expectedOwnerId =
+        initialDB.owners.keys.max + 1
+        entityAs[Long] shouldBe expectedOwnerId
       }
       Get("/owner?lastName=Schultz") ~> service(initialState)().route ~> check {
         checkResponseOk

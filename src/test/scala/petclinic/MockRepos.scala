@@ -1,7 +1,7 @@
 package petclinic
 
 import cats.data.State
-import cats.data.State.{ get, modify }
+import cats.data.State.get
 
 trait MockRepos extends Data {
 
@@ -21,11 +21,11 @@ trait MockRepos extends Data {
       def findPetsByOwnerId(ownerId: Long): DBAction[List[Pet]] =
         get.map(_.pets.values.filter(_.ownerId == ownerId).toList)
 
-      def save(pet: Pet): DBAction[Unit] =
-        modify { db =>
-          db.copy(
-            pets = db.pets + (pet.id -> pet)
-          )
+      def save(pet: Pet): DBAction[Long] =
+        get.transform {
+          case (db, _) =>
+            val genId = db.pets.keys.max + 1
+            (db.copy(pets = db.pets + (genId -> pet)), genId)
         }
     }
 
@@ -37,11 +37,11 @@ trait MockRepos extends Data {
       def findByLastName(lastName: String): DBAction[List[Owner]] =
         get.map(_.owners.values.filter(_.lastName == lastName).toList)
 
-      def save(owner: Owner): DBAction[Unit] =
-        modify { db =>
-          db.copy(
-            owners = db.owners + (owner.id -> owner)
-          )
+      def save(owner: Owner): DBAction[Long] =
+        get.transform {
+          case (db, _) =>
+            val genId = db.owners.keys.max + 1
+            (db.copy(owners = db.owners + (genId -> owner)), genId)
         }
     }
 }
