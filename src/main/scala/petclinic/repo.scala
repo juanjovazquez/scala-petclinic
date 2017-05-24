@@ -4,7 +4,7 @@ import scala.language.higherKinds
 import scala.concurrent.{ ExecutionContext, Future }
 
 sealed trait Repo[A, F[_]] {
-  def findById(id: Int): F[A]
+  def findById(id: Long): F[A]
   def save(entity: A): F[Unit]
 }
 
@@ -21,8 +21,8 @@ object OwnerRepo {
 
 trait PetRepo[F[_]] extends Repo[Pet, F] {
   def findPetTypes: F[List[PetType]]
-  def findPetTypeById(petTypeId: Int): F[PetType]
-  def findPetsByOwnerId(ownerId: Int): F[List[Pet]]
+  def findPetTypeById(petTypeId: Long): F[PetType]
+  def findPetsByOwnerId(ownerId: Long): F[List[Pet]]
 }
 
 object PetRepo {
@@ -41,5 +41,5 @@ object VetRepo {
 }
 
 trait VisitRepo[F[_]] extends Repo[Visit, F] {
-  def findByPetId(petId: Int): F[List[Visit]]
+  def findByPetId(petId: Long): F[List[Visit]]
 }

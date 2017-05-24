@@ -12,20 +12,20 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
   private[this] val PetsByOwnerId   = s"$PetsBaseSql where owner_id = ?"
   private[this] val PetTypesById    = s"$PetTypesBaseSql where id = ?"
 
-  def findById(id: Int): Future[Pet] =
+  def findById(id: Long): Future[Pet] =
     withConnection { conn =>
       val statement = conn.prepareStatement(PetsById)
-      statement.setInt(1, id)
+      statement.setLong(1, id)
       val resultSet = statement.executeQuery()
       resultSet.toEntity[Pet].getOrElse(throw SQLException(s"Pet with id: $id not found"))
     }
 
   def save(pet: Pet): Future[Unit] = ???
 
-  def findPetTypeById(petTypeId: Int): Future[PetType] =
+  def findPetTypeById(petTypeId: Long): Future[PetType] =
     withConnection { conn =>
       val statement = conn.prepareStatement(PetTypesById)
-      statement.setInt(1, petTypeId)
+      statement.setLong(1, petTypeId)
       val resultSet = statement.executeQuery()
       resultSet
         .toEntity[PetType]
@@ -39,10 +39,10 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
       resultSet.toEntityList[PetType]
     }
 
-  def findPetsByOwnerId(ownerId: Int): Future[List[Pet]] =
+  def findPetsByOwnerId(ownerId: Long): Future[List[Pet]] =
     withConnection { conn =>
       val statement = conn.prepareStatement(PetsByOwnerId)
-      statement.setInt(1, ownerId)
+      statement.setLong(1, ownerId)
       statement.executeQuery().toEntityList[Pet]
     }
 }

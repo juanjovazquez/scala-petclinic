@@ -9,16 +9,16 @@ trait MockRepos extends Data {
 
   implicit val petRepo: PetRepo[DBAction] =
     new PetRepo[DBAction] {
-      def findById(id: Int): DBAction[Pet] =
+      def findById(id: Long): DBAction[Pet] =
         get.map(_.pets(id))
 
       def findPetTypes: DBAction[List[PetType]] =
         get.map(_.petTypes.values.toList)
 
-      def findPetTypeById(petTypeId: Int): DBAction[PetType] =
+      def findPetTypeById(petTypeId: Long): DBAction[PetType] =
         get.map(_.petTypes(petTypeId))
 
-      def findPetsByOwnerId(ownerId: Int): DBAction[List[Pet]] =
+      def findPetsByOwnerId(ownerId: Long): DBAction[List[Pet]] =
         get.map(_.pets.values.filter(_.ownerId == ownerId).toList)
 
       def save(pet: Pet): DBAction[Unit] =
@@ -31,7 +31,7 @@ trait MockRepos extends Data {
 
   implicit val ownerRepo: OwnerRepo[DBAction] =
     new OwnerRepo[DBAction] {
-      def findById(id: Int): DBAction[Owner] =
+      def findById(id: Long): DBAction[Owner] =
         get.map(_.owners(id))
 
       def findByLastName(lastName: String): DBAction[List[Owner]] =

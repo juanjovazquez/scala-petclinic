@@ -47,7 +47,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
       }
     }
 
-    "return an owner by id" in {
+    "return an owner with its pets by id" in {
       Get("/owner/1") ~> service.route ~> check {
         checkResponseOk
         entityAs[OwnerInfo] shouldBe

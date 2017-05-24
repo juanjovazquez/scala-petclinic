@@ -29,22 +29,22 @@ object FromResultSet {
   implicit val petFromRs: FromResultSet[Pet] =
     build { rs =>
       Pet(
-        rs.getInt("id"),
+        rs.getLong("id"),
         rs.getString("name"),
         rs.getDate("birth_date"),
-        rs.getInt("type_id"),
-        rs.getInt("owner_id"))
+        rs.getLong("type_id"),
+        rs.getLong("owner_id"))
     }
 
   implicit val petTypeFromRs: FromResultSet[PetType] =
     build { rs =>
-      PetType(rs.getInt("id"), rs.getString("name"))
+      PetType(rs.getLong("id"), rs.getString("name"))
     }
 
   implicit val ownerFromRs: FromResultSet[Owner] =
     build { rs =>
       Owner(
-        rs.getInt("id"),
+        rs.getLong("id"),
         rs.getString("first_name") + " " + rs.getString("last_name"),
         rs.getString("first_name"),
         rs.getString("last_name"),
