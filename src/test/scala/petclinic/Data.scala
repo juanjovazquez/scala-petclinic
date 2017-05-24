@@ -107,7 +107,7 @@ trait Data {
       13 -> Pet(13, "Sly", "2002-06-08", 1, 10)
     )
 
-  implicit val initialDB = DB(owners, petTypes, pets)
+  val initialDB = DB(owners, petTypes, pets)
 
   implicit def toDate(s: String): java.util.Date = {
     val format = new java.text.SimpleDateFormat("yyyy-MM-dd")

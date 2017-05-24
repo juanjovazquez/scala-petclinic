@@ -35,6 +35,22 @@ trait PetClinicService[F[_]] {
         }
       }
     } ~
+    pathPrefix("owner") {
+      pathEndOrSingleSlash {
+        get {
+          parameter('lastName.?) { lastName =>
+            val default = monadEv.pure(List.empty[Owner])
+            val owners  = lastName.map(ownerRepo.findByLastName).getOrElse(default)
+            complete(owners)
+          }
+        } ~
+        post {
+          entity(as[Owner]) { owner =>
+            complete(ownerRepo.save(owner))
+          }
+        }
+      }
+    } ~
     pathPrefix("owner" / IntNumber) { ownerId =>
       pathEndOrSingleSlash {
         get {
@@ -42,22 +58,6 @@ trait PetClinicService[F[_]] {
           val pets      = petRepo.findPetsByOwnerId(ownerId)
           val ownerInfo = (owner, pets).map2(OwnerInfo)
           complete(ownerInfo)
-        }
-      }
-    } ~
-    pathPrefix("owner") {
-      pathEndOrSingleSlash {
-        post {
-          entity(as[Owner]) { owner =>
-            complete("")
-          }
-        }
-        get {
-          parameter('lastName.?) { lastName =>
-            val default = monadEv.pure(List.empty[Owner])
-            val owners  = lastName.map(ownerRepo.findByLastName).getOrElse(default)
-            complete(owners)
-          }
         }
       }
     }

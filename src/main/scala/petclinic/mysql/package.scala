@@ -1,13 +1,15 @@
 package petclinic
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ ExecutionContext, Future }
+import scala.sys.process._
+import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
-import java.sql.{Connection, DriverManager, SQLException}
+import java.sql.{ Connection, DriverManager, SQLException }
 
 package object mysql {
+  final val Ip       = "docker-machine ip".!!
   final val Driver   = "com.mysql.jdbc.Driver"
-  final val Url      = "jdbc:mysql://127.0.0.1/petclinic"
+  final val Url      = s"jdbc:mysql://$Ip/petclinic"
   final val username = "root"
   final val password = "root"
 

@@ -6,16 +6,15 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Future] {
 
-  private[this] val PetsBaseSql =
-    "select id, name, birth_date, type_id, owner_id from pets"
-
-  private[this] val PetTypesBaseSql =
-    "select id, name from types"
+  private[this] val PetsBaseSql     = "select id, name, birth_date, type_id, owner_id from pets"
+  private[this] val PetTypesBaseSql = "select id, name from types"
+  private[this] val PetsById        = s"$PetsBaseSql where id = ?"
+  private[this] val PetsByOwnerId   = s"$PetsBaseSql where owner_id = ?"
+  private[this] val PetTypesById    = s"$PetTypesBaseSql where id = ?"
 
   def findById(id: Int): Future[Pet] =
     withConnection { conn =>
-      val sql       = s"$PetsBaseSql where id = ?"
-      val statement = conn.prepareStatement(sql)
+      val statement = conn.prepareStatement(PetsById)
       statement.setInt(1, id)
       val resultSet = statement.executeQuery()
       resultSet.toEntity[Pet].getOrElse(throw SQLException(s"Pet with id: $id not found"))
@@ -25,8 +24,7 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
 
   def findPetTypeById(petTypeId: Int): Future[PetType] =
     withConnection { conn =>
-      val sql       = s"$PetTypesBaseSql where id = ?"
-      val statement = conn.prepareStatement(sql)
+      val statement = conn.prepareStatement(PetTypesById)
       statement.setInt(1, petTypeId)
       val resultSet = statement.executeQuery()
       resultSet
@@ -43,8 +41,7 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
 
   def findPetsByOwnerId(ownerId: Int): Future[List[Pet]] =
     withConnection { conn =>
-      val sql       = s"$PetsBaseSql where owner_id = ?"
-      val statement = conn.prepareStatement(sql)
+      val statement = conn.prepareStatement(PetsByOwnerId)
       statement.setInt(1, ownerId)
       statement.executeQuery().toEntityList[Pet]
     }

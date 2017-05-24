@@ -12,15 +12,9 @@ import petclinic.Marshallers._
 
 class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with MockRepos {
 
-  private[this] val service = new PetClinicService[DBAction] {
-    def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[DBAction[A], B] = implicitly
-    val monadEv: Monad[DBAction]                                                    = implicitly
-  }
-  private[this] val route = service.route
-
   "PetClinicService" should {
     "return the pet types" in {
-      Get("/petTypes") ~> route ~> check {
+      Get("/petTypes") ~> service.route ~> check {
         checkResponseOk
         entityAs[List[PetType]] shouldBe
         List(
@@ -35,7 +29,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
     }
 
     "return a pet by id" in {
-      Get("/pet/1") ~> route ~> check {
+      Get("/pet/1") ~> service.route ~> check {
         checkResponseOk
         entityAs[PetInfo] shouldBe PetInfo(
           Pet(1, "Leo", "2000-09-07", 1, 1),
@@ -54,7 +48,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
     }
 
     "return an owner by id" in {
-      Get("/owner/1") ~> route ~> check {
+      Get("/owner/1") ~> service.route ~> check {
         checkResponseOk
         entityAs[OwnerInfo] shouldBe
         OwnerInfo(
@@ -73,7 +67,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
     }
 
     "return owners by lastName" in {
-      Get("/owner?lastName=Davis") ~> route ~> check {
+      Get("/owner?lastName=Davis") ~> service.route ~> check {
         checkResponseOk
         entityAs[List[Owner]] shouldBe
         List(
@@ -100,12 +94,44 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
     }
 
     "return an empty list of owners when the parameter `lastName` is missing" in {
-      Get("/owner") ~> route ~> check {
+      Get("/owner") ~> service.route ~> check {
         checkResponseOk
         entityAs[List[Owner]] shouldBe List()
       }
     }
+
+    "save a new owner" in {
+      var initialState = initialDB
+      Post(
+        "/owner",
+        Owner(
+          999,
+          "Sam Schultz",
+          "Sam",
+          "Schultz",
+          "4, Evans Street",
+          "Wollongong",
+          "4444444444"
+        )) ~> service(initialState) { initialState = _ }.route ~> check {
+        checkResponseOk
+      }
+      Get("/owner?lastName=Schultz") ~> service(initialState)().route ~> check {
+        checkResponseOk
+        entityAs[List[Owner]].length shouldBe 1
+      }
+    }
   }
+
+  private[this] def service: PetClinicService[DBAction] = service()()
+
+  private[this] def service(
+      initialState: DB = initialDB
+  )(onResponse: DB => Unit = _ => ()): PetClinicService[DBAction] =
+    new PetClinicService[DBAction] {
+      def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[DBAction[A], B] =
+        stateMarshaller(initialState)(onResponse)
+      val monadEv: Monad[DBAction] = implicitly
+    }
 
   private[this] def checkResponseOk = {
     status shouldBe StatusCodes.OK

@@ -7,8 +7,13 @@ mysql:
     - MYSQL_DATABASE=test
   volumes:
     - "./conf.d:/etc/mysql/conf.d:ro"
+  extra_hosts:
+    - "dh:10.0.2.2"
 
 # mysql -h 127.0.0.1 -P 3306 -u root -p
 # mysql -h 127.0.0.1 -u root -p < src/main/resources/db/mysql/schema.sql
 # mysql petclinic -h 127.0.0.1 -u root -p < src/main/resources/db/mysql/data.sql
+
+# mac os x: docker-machine
+# mysql -h $(docker-machine ip) -u root -p
 
