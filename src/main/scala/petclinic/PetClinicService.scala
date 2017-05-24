@@ -48,6 +48,11 @@ trait PetClinicService[F[_]] {
           entity(as[Owner]) { owner =>
             complete(ownerRepo.save(owner))
           }
+        } ~
+        put {
+          entity(as[Owner]) { owner =>
+            complete(ownerRepo.update(owner))
+          }
         }
       }
     } ~

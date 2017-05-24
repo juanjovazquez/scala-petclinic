@@ -1,7 +1,7 @@
 package petclinic
 
 import cats.data.State
-import cats.data.State.get
+import cats.data.State.{ get, modify }
 
 trait MockRepos extends Data {
 
@@ -27,6 +27,11 @@ trait MockRepos extends Data {
             val genId = db.pets.keys.max + 1
             (db.copy(pets = db.pets + (genId -> pet)), genId)
         }
+
+      def update(pet: Pet): DBAction[Unit] =
+        modify { db =>
+          db.copy(pets = db.pets + (pet.id.get -> pet))
+        }
     }
 
   implicit val ownerRepo: OwnerRepo[DBAction] =
@@ -42,6 +47,11 @@ trait MockRepos extends Data {
           case (db, _) =>
             val genId = db.owners.keys.max + 1
             (db.copy(owners = db.owners + (genId -> owner)), genId)
+        }
+
+      def update(owner: Owner): DBAction[Unit] =
+        modify { db =>
+          db.copy(owners = db.owners + (owner.id.get -> owner))
         }
     }
 }

@@ -22,6 +22,8 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
 
   def save(pet: Pet): Future[Long] = ???
 
+  def update(entity: Pet): Future[Unit] = ???
+
   def findPetTypeById(petTypeId: Long): Future[PetType] =
     withConnection { conn =>
       val statement = conn.prepareStatement(PetTypesById)

@@ -123,6 +123,27 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
         entityAs[List[Owner]].length shouldBe 1
       }
     }
+
+    "update an existing owner" in {
+      var initialState = initialDB
+      Put(
+        "/owner",
+        Owner(
+          id = Some(1),
+          "Sam Changed",
+          "Sam",
+          "Changed",
+          "4, New Evans Street",
+          "Wollongong",
+          "4444444444"
+        )) ~> service(initialState) { initialState = _ }.route ~> check {
+        checkResponseOk
+      }
+      Get("/owner/1") ~> service(initialState)().route ~> check {
+        checkResponseOk
+        entityAs[OwnerInfo].owner.name shouldBe "Sam Changed"
+      }
+    }
   }
 
   private[this] def service: PetClinicService[DBAction] = service()()
