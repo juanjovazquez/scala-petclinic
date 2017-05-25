@@ -2,32 +2,11 @@ package petclinic
 package mysql
 
 import petclinic.mysql.implicits._
-
+import petclinic.mysql.PetRepo._
 import scala.concurrent.{ExecutionContext, Future}
 import java.sql.Statement
 
 final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Future] {
-
-  val Pets      = "pets"
-  val Types     = "types"
-  val Id        = "id"
-  val Name      = "name"
-  val BirthDate = "birth_date"
-  val TypeId    = "type_id"
-  val OwnerId   = "owner_id"
-
-  private[this] val PetsBaseSql     = s"select $Id, $Name, $BirthDate, $TypeId, $OwnerId from $Pets"
-  private[this] val PetTypesBaseSql = s"select $Id, $Name from $Types"
-  private[this] val PetsById        = s"$PetsBaseSql where $Id = ?"
-  private[this] val PetsByOwnerId   = s"$PetsBaseSql where $OwnerId = ?"
-  private[this] val PetTypesById    = s"$PetTypesBaseSql where $Id = ?"
-  private[this] val InsertPet =
-    s"""|insert into $Pets ($Name, $BirthDate, $TypeId, $OwnerId)
-        |values (?, ?, ?, ?)""".stripMargin
-  private[this] val UpdatePet =
-    s"""|update $Pets
-        |set $Name = ?, $BirthDate = ?, $TypeId = ?, $OwnerId = ?
-        |where $Id = ?""".stripMargin
 
   def findById(id: Long): Future[Pet] =
     withConnection { conn =>
@@ -71,4 +50,27 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
       statement.setLong(1, ownerId)
       statement.executeQuery().toEntityList[Pet]
     }
+}
+
+object PetRepo {
+  val Pets      = "pets"
+  val Types     = "types"
+  val Id        = "id"
+  val Name      = "name"
+  val BirthDate = "birth_date"
+  val TypeId    = "type_id"
+  val OwnerId   = "owner_id"
+
+  private val PetsBaseSql     = s"select $Id, $Name, $BirthDate, $TypeId, $OwnerId from $Pets"
+  private val PetTypesBaseSql = s"select $Id, $Name from $Types"
+  private val PetsById        = s"$PetsBaseSql where $Id = ?"
+  private val PetsByOwnerId   = s"$PetsBaseSql where $OwnerId = ?"
+  private val PetTypesById    = s"$PetTypesBaseSql where $Id = ?"
+  private val InsertPet =
+    s"""|insert into $Pets ($Name, $BirthDate, $TypeId, $OwnerId)
+        |values (?, ?, ?, ?)""".stripMargin
+  private val UpdatePet =
+    s"""|update $Pets
+        |set $Name = ?, $BirthDate = ?, $TypeId = ?, $OwnerId = ?
+        |where $Id = ?""".stripMargin
 }

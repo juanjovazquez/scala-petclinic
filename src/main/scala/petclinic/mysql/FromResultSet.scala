@@ -29,16 +29,16 @@ object FromResultSet {
   implicit val petFromRs: FromResultSet[Pet] =
     build { rs =>
       Pet(
-        Some(rs.getLong("id")),
-        rs.getString("name"),
-        rs.getObject("birth_date", classOf[java.time.LocalDate]),
-        rs.getLong("type_id"),
-        rs.getLong("owner_id"))
+        Some(rs.getLong(PetRepo.Id)),
+        rs.getString(PetRepo.Name),
+        rs.getObject(PetRepo.BirthDate, classOf[java.time.LocalDate]),
+        rs.getLong(PetRepo.TypeId),
+        rs.getLong(PetRepo.OwnerId))
     }
 
   implicit val petTypeFromRs: FromResultSet[PetType] =
     build { rs =>
-      PetType(Some(rs.getLong("id")), rs.getString("name"))
+      PetType(Some(rs.getLong(PetRepo.Id)), rs.getString(PetRepo.Name))
     }
 
   implicit val ownerFromRs: FromResultSet[Owner] =
