@@ -1,5 +1,4 @@
 import io.circe.{ Decoder, Encoder, Json }
-import java.util.Date
 
 package object petclinic {
 
@@ -7,15 +6,14 @@ package object petclinic {
 
   type Vet = Person
 
-  def sdf = new java.text.SimpleDateFormat("yyyy-MM-dd")
+  private val dtf = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
   // circe
-  implicit val dateEncoder: Encoder[Date] = new Encoder[Date] {
-    def apply(date: Date): Json =
-      Json.fromString(sdf.format(date))
-
+  implicit val dateEncoder: Encoder[java.time.LocalDate] = new Encoder[java.time.LocalDate] {
+    def apply(date: java.time.LocalDate): Json =
+      Json.fromString(date.format(dtf))
   }
 
-  implicit val dateDecoder: Decoder[Date] =
-    Decoder.decodeString.map(sdf.parse(_))
+  implicit val dateDecoder: Decoder[java.time.LocalDate] =
+    Decoder.decodeString.map(java.time.LocalDate.parse(_, dtf))
 }

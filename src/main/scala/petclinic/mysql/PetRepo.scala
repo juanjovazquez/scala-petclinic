@@ -2,15 +2,32 @@ package petclinic
 package mysql
 
 import petclinic.mysql.implicits._
-import scala.concurrent.{ ExecutionContext, Future }
+
+import scala.concurrent.{ExecutionContext, Future}
+import java.sql.Statement
 
 final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Future] {
 
-  private[this] val PetsBaseSql     = "select id, name, birth_date, type_id, owner_id from pets"
-  private[this] val PetTypesBaseSql = "select id, name from types"
-  private[this] val PetsById        = s"$PetsBaseSql where id = ?"
-  private[this] val PetsByOwnerId   = s"$PetsBaseSql where owner_id = ?"
-  private[this] val PetTypesById    = s"$PetTypesBaseSql where id = ?"
+  val Pets      = "pets"
+  val Types     = "types"
+  val Id        = "id"
+  val Name      = "name"
+  val BirthDate = "birth_date"
+  val TypeId    = "type_id"
+  val OwnerId   = "owner_id"
+
+  private[this] val PetsBaseSql     = s"select $Id, $Name, $BirthDate, $TypeId, $OwnerId from $Pets"
+  private[this] val PetTypesBaseSql = s"select $Id, $Name from $Types"
+  private[this] val PetsById        = s"$PetsBaseSql where $Id = ?"
+  private[this] val PetsByOwnerId   = s"$PetsBaseSql where $OwnerId = ?"
+  private[this] val PetTypesById    = s"$PetTypesBaseSql where $Id = ?"
+  private[this] val InsertPet =
+    s"""|insert into $Pets ($Name, $BirthDate, $TypeId, $OwnerId)
+        |values (?, ?, ?, ?)""".stripMargin
+  private[this] val UpdatePet =
+    s"""|update $Pets
+        |set $Name = ?, $BirthDate = ?, $TypeId = ?, $OwnerId = ?
+        |where $Id = ?""".stripMargin
 
   def findById(id: Long): Future[Pet] =
     withConnection { conn =>
@@ -21,6 +38,13 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
     }
 
   def save(pet: Pet): Future[Long] = ???
+//    withConnection { conn =>
+//      val pst = conn.prepareStatement(InsertPet, Statement.RETURN_GENERATED_KEYS)
+//      pst.setString(1, pet.name)
+//      pst.setDate()
+//      pst.setDate(2, pet.birthDate)
+////      pst.setString(3, pet.birthDate)
+//    }
 
   def update(entity: Pet): Future[Unit] = ???
 

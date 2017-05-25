@@ -31,12 +31,12 @@ final case class PetType(id: Option[Id], name: String) extends NamedEntity
 final case class Pet(
     id: Option[Id],
     name: String,
-    birthDate: java.util.Date,
+    birthDate: java.time.LocalDate,
     petTypeId: Id,
     ownerId: Id)
     extends NamedEntity
 
 final case class Speciality(id: Option[Id], name: String) extends NamedEntity
 
-final case class Visit(id: Option[Id], date: java.util.Date, description: String, pet: Pet)
+final case class Visit(id: Option[Id], date: java.time.LocalDate, description: String, pet: Pet)
     extends BaseEntity

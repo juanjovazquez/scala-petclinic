@@ -31,7 +31,7 @@ object FromResultSet {
       Pet(
         Some(rs.getLong("id")),
         rs.getString("name"),
-        rs.getDate("birth_date"),
+        rs.getObject("birth_date", classOf[java.time.LocalDate]),
         rs.getLong("type_id"),
         rs.getLong("owner_id"))
     }
@@ -44,13 +44,13 @@ object FromResultSet {
   implicit val ownerFromRs: FromResultSet[Owner] =
     build { rs =>
       Owner(
-        Some(rs.getLong("id")),
-        rs.getString("first_name") + " " + rs.getString("last_name"),
-        rs.getString("first_name"),
-        rs.getString("last_name"),
-        rs.getString("address"),
-        rs.getString("city"),
-        rs.getString("telephone")
+        Some(rs.getLong(OwnerRepo.Id)),
+        rs.getString(OwnerRepo.FirstName) + " " + rs.getString(OwnerRepo.LastName),
+        rs.getString(OwnerRepo.FirstName),
+        rs.getString(OwnerRepo.LastName),
+        rs.getString(OwnerRepo.Address),
+        rs.getString(OwnerRepo.City),
+        rs.getString(OwnerRepo.Telephone)
       )
     }
 }
