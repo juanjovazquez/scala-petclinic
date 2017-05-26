@@ -29,9 +29,18 @@ trait PetClinicService[F[_]] {
             petRepo.findById(petId).flatMap { pet =>
               val owner   = ownerRepo.findById(pet.ownerId)
               val petType = petRepo.findPetTypeById(pet.petTypeId)
-              (petType, owner).map2(PetInfo(pet, _, _))
+              (petType, owner).map2((pt, ow) => PetInfo(pet, pt, Some(ow)))
             }
           complete(petInfo)
+        }
+      }
+    } ~
+    pathPrefix("pet") {
+      pathEndOrSingleSlash {
+        post {
+          entity(as[PetInfo]) { petInfo =>
+            complete(petInfo)
+          }
         }
       }
     } ~

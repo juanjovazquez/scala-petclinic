@@ -109,11 +109,11 @@ trait Data {
 
   val initialDB = DB(owners, petTypes, pets)
 
-  implicit def toDate(s: String): java.util.Date = {
-    val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
-    format.parse(s)
+  implicit def toDate(s: String): java.time.LocalDate = {
+    val dtf = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    java.time.LocalDate.parse(s, dtf)
   }
 
-  implicit def LongToOption(x: Long): Option[Long] =
-    Some(x)
+  implicit def IntToLongOption(x: Int): Option[Long] =
+    Some(x.toLong)
 }

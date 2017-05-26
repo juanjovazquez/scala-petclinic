@@ -34,7 +34,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
         entityAs[PetInfo] shouldBe PetInfo(
           Pet(1, "Leo", "2000-09-07", 1, 1),
           PetType(1, "cat"),
-          Owner(
+          Some(Owner(
             1,
             "George Franklin",
             "George",
@@ -42,7 +42,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
             "110 W. Liberty St.",
             "Madison",
             "6085551023"
-          )
+          ))
         )
       }
     }
