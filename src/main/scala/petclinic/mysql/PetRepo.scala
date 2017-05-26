@@ -16,16 +16,29 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
       resultSet.toEntity[Pet].getOrElse(throw SQLException(s"Pet with id: $id not found"))
     }
 
-  def save(pet: Pet): Future[Long] = ???
-//    withConnection { conn =>
-//      val pst = conn.prepareStatement(InsertPet, Statement.RETURN_GENERATED_KEYS)
-//      pst.setString(1, pet.name)
-//      pst.setDate()
-//      pst.setDate(2, pet.birthDate)
-////      pst.setString(3, pet.birthDate)
-//    }
+  def save(pet: Pet): Future[Long] =
+    withConnection { conn =>
+      val pst = conn.prepareStatement(InsertPet, Statement.RETURN_GENERATED_KEYS)
+      pst.setString(1, pet.name)
+      pst.setObject(2, pet.birthDate)
+      pst.setLong(3, pet.petTypeId)
+      pst.setLong(4, pet.ownerId)
+      pst.executeUpdate()
+      val keys = pst.getGeneratedKeys
+      keys.next()
+      keys.getLong(1)
+    }
 
-  def update(entity: Pet): Future[Unit] = ???
+  def update(pet: Pet): Future[Unit] =
+    withConnection { conn =>
+      val pst = conn.prepareStatement(UpdatePet)
+      pst.setString(1, pet.name)
+      pst.setObject(2, pet.birthDate)
+      pst.setLong(3, pet.petTypeId)
+      pst.setLong(4, pet.ownerId)
+      pst.setLong(5, pet.id.get)
+      pst.executeUpdate()
+    }
 
   def findPetTypeById(petTypeId: Long): Future[PetType] =
     withConnection { conn =>
