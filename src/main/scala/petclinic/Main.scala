@@ -7,18 +7,22 @@ import akka.http.scaladsl.marshalling.GenericMarshallers.futureMarshaller
 import akka.http.scaladsl.marshalling.Marshaller
 import cats.Monad
 import cats.implicits._
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 object Main {
   def main(args: Array[String]): Unit = {
     implicit val system       = ActorSystem("petclinic-as")
     implicit val materializer = ActorMaterializer()
     implicit val ec           = system.dispatcher
-    val service = new PetClinicService[Future] {
-      def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[Future[A], B] = implicitly
-      val monadEv: Monad[Future]                                                    = implicitly
-    }
-    Http().bindAndHandle(service.route, "localhost", 8080)
+    Http().bindAndHandle(service().route, "localhost", 8080)
     println(s"Server online at http://localhost:8080/")
   }
+}
+
+object service {
+  def apply()(implicit ec: ExecutionContext): PetClinicService[Future] =
+    new PetClinicService[Future] {
+      def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[Future[A], B] = implicitly
+      val monadEv: Monad[Future] = implicitly
+    }
 }
