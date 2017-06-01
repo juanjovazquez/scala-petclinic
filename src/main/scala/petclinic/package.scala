@@ -1,10 +1,14 @@
+import cats.data.EitherT
 import io.circe.{ Decoder, Encoder, Json }
+import scala.concurrent.Future
 
 package object petclinic {
 
   type Id = Long
 
   type Vet = Person
+
+  type Response[A] = EitherT[Future, PetClinicError, A]
 
   private val dtf = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
 

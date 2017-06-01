@@ -1,7 +1,7 @@
 package petclinic
 
+import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
-import scala.concurrent.{ ExecutionContext, Future }
 
 sealed trait Repo[A, F[_]] {
   def findById(id: Long): F[A]
@@ -16,7 +16,7 @@ trait OwnerRepo[F[_]] extends Repo[Owner, F] {
 object OwnerRepo {
   def apply[F[_]](implicit instance: OwnerRepo[F]): OwnerRepo[F] = instance
 
-  implicit def ownerRepoInstance(implicit ec: ExecutionContext): OwnerRepo[Future] =
+  implicit def ownerRepoInstance(implicit ec: ExecutionContext): OwnerRepo[Response] =
     new mysql.OwnerRepo
 }
 
@@ -29,7 +29,7 @@ trait PetRepo[F[_]] extends Repo[Pet, F] {
 object PetRepo {
   def apply[F[_]](implicit instance: PetRepo[F]): PetRepo[F] = instance
 
-  implicit def petRepoInstance(implicit ec: ExecutionContext): PetRepo[Future] =
+  implicit def petRepoInstance(implicit ec: ExecutionContext): PetRepo[Response] =
     new mysql.PetRepo
 }
 

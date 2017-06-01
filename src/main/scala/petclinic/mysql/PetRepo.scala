@@ -3,20 +3,23 @@ package mysql
 
 import petclinic.mysql.implicits._
 import petclinic.mysql.PetRepo._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import java.sql.Statement
 
-final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Future] {
+final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Response] {
 
-  def findById(id: Long): Future[Pet] =
+  def findById(id: Long): Response[Pet] =
     withConnection { conn =>
       val statement = conn.prepareStatement(PetsById)
       statement.setLong(1, id)
       val resultSet = statement.executeQuery()
-      resultSet.toEntity[Pet].getOrElse(throw SQLException(s"Pet with id: $id not found"))
+      resultSet.toEntity[Pet] match {
+        case Some(pet) => Right(pet)
+        case None      => Left(PetClinicError(500, s"Pet with id: $id not found"))
+      }
     }
 
-  def save(pet: Pet): Future[Long] =
+  def save(pet: Pet): Response[Long] =
     withConnection { conn =>
       val pst = conn.prepareStatement(InsertPet, Statement.RETURN_GENERATED_KEYS)
       pst.setString(1, pet.name)
@@ -26,10 +29,10 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
       pst.executeUpdate()
       val keys = pst.getGeneratedKeys
       keys.next()
-      keys.getLong(1)
+      Right(keys.getLong(1))
     }
 
-  def update(pet: Pet): Future[Unit] =
+  def update(pet: Pet): Response[Unit] =
     withConnection { conn =>
       val pst = conn.prepareStatement(UpdatePet)
       pst.setString(1, pet.name)
@@ -37,31 +40,32 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Fut
       pst.setLong(3, pet.petTypeId)
       pst.setLong(4, pet.ownerId)
       pst.setLong(5, pet.id.get)
-      pst.executeUpdate()
+      Right(pst.executeUpdate())
     }
 
-  def findPetTypeById(petTypeId: Long): Future[PetType] =
+  def findPetTypeById(petTypeId: Long): Response[PetType] =
     withConnection { conn =>
       val statement = conn.prepareStatement(PetTypesById)
       statement.setLong(1, petTypeId)
       val resultSet = statement.executeQuery()
-      resultSet
-        .toEntity[PetType]
-        .getOrElse(throw SQLException(s"PetType with id $petTypeId not found"))
+      resultSet.toEntity[PetType] match {
+        case Some(petType) => Right(petType)
+        case None          => Left(PetClinicError(500, s"PetType with id $petTypeId not found"))
+      }
     }
 
-  def findPetTypes: Future[List[PetType]] =
+  def findPetTypes: Response[List[PetType]] =
     withConnection { conn =>
       val statement = conn.createStatement()
       val resultSet = statement.executeQuery(PetTypesBaseSql)
-      resultSet.toEntityList[PetType]
+      Right(resultSet.toEntityList[PetType])
     }
 
-  def findPetsByOwnerId(ownerId: Long): Future[List[Pet]] =
+  def findPetsByOwnerId(ownerId: Long): Response[List[Pet]] =
     withConnection { conn =>
       val statement = conn.prepareStatement(PetsByOwnerId)
       statement.setLong(1, ownerId)
-      statement.executeQuery().toEntityList[Pet]
+      Right(statement.executeQuery().toEntityList[Pet])
     }
 }
 

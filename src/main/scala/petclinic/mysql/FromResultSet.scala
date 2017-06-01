@@ -33,7 +33,8 @@ object FromResultSet {
         rs.getString(PetRepo.Name),
         rs.getObject(PetRepo.BirthDate, classOf[java.time.LocalDate]),
         rs.getLong(PetRepo.TypeId),
-        rs.getLong(PetRepo.OwnerId))
+        rs.getLong(PetRepo.OwnerId)
+      )
     }
 
   implicit val petTypeFromRs: FromResultSet[PetType] =

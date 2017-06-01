@@ -3,20 +3,23 @@ package mysql
 
 import petclinic.mysql.implicits._
 import petclinic.mysql.OwnerRepo._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 import java.sql.Statement
 
-final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo[Future] {
+final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo[Response] {
 
-  def findById(id: Long): Future[Owner] =
+  def findById(id: Long): Response[Owner] =
     withConnection { conn =>
       val pst = conn.prepareStatement(FindOwnerById)
       pst.setLong(1, id)
       val resultSet = pst.executeQuery()
-      resultSet.toEntity[Owner].getOrElse(throw SQLException(s"Owner with id: $id not found"))
+      resultSet.toEntity[Owner] match {
+        case Some(owner) => Right(owner)
+        case None        => Left(PetClinicError(500, s"Owner with id: $id not found"))
+      }
     }
 
-  def save(owner: Owner): Future[Long] =
+  def save(owner: Owner): Response[Long] =
     withConnection { conn =>
       val pst = conn.prepareStatement(InsertOwner, Statement.RETURN_GENERATED_KEYS)
       pst.setString(1, owner.firstName)
@@ -27,10 +30,10 @@ final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo
       pst.executeUpdate()
       val keys = pst.getGeneratedKeys
       keys.next()
-      keys.getLong(1)
+      Right(keys.getLong(1)) // TODO Manage error
     }
 
-  def update(owner: Owner): Future[Unit] =
+  def update(owner: Owner): Response[Unit] =
     withConnection { conn =>
       val pst = conn.prepareStatement(UpdateOwner)
       pst.setString(1, owner.firstName)
@@ -39,14 +42,14 @@ final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo
       pst.setString(4, owner.city)
       pst.setString(5, owner.telephone)
       pst.setLong(6, owner.id.get)
-      pst.executeUpdate()
+      Right(pst.executeUpdate())
     }
 
-  def findByLastName(lastName: String): Future[List[Owner]] =
+  def findByLastName(lastName: String): Response[List[Owner]] =
     withConnection { conn =>
       val pst = conn.prepareStatement(FindOwnersByLastName)
       pst.setString(1, lastName)
-      pst.executeQuery().toEntityList[Owner]
+      Right(pst.executeQuery().toEntityList[Owner])
     }
 }
 

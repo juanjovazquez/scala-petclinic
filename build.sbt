@@ -15,7 +15,8 @@ libraryDependencies ++= Seq(
 javaOptions in run ++= Seq("-Djdbc.drivers=com.mysql.cj.jdbc.Driver")
 
 scalacOptions ++= Seq(
-  "-encoding", "UTF-8",
+  "-encoding",
+  "UTF-8",
   "-feature",
   "-deprecation",
   "-unchecked",

@@ -1,5 +1,7 @@
 package petclinic
 
+case class PetClinicError(httpCode: Int, msg: String)
+
 sealed abstract class BaseEntity extends Product with Serializable {
   def id: Option[Id]
 }
