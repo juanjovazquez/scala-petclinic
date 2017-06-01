@@ -15,22 +15,19 @@ libraryDependencies ++= Seq(
 javaOptions in run ++= Seq("-Djdbc.drivers=com.mysql.cj.jdbc.Driver")
 
 scalacOptions ++= Seq(
-  "-deprecation",
-  "-encoding",
-  "UTF-8",
+  "-encoding", "UTF-8",
   "-feature",
-  "-language:_",
-  "-target:jvm-1.8",
+  "-deprecation",
   "-unchecked",
-  //"-Xlog-implicits",
-  "-Xlint",
-  "-Xfuture",
+  "-Xlint:-unused",
+  "-Ywarn-unused",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen"
-  //  ,
-  //"-Ywarn-unused-import"
+  "-Ywarn-numeric-widen",
+  "-Xfuture"
 )
+
+scalacOptions in (Compile, console) ~= (_.filterNot(_.contains("unused")))
 
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
 
