@@ -1,6 +1,6 @@
 package petclinic
 
-import akka.http.scaladsl.marshalling.Marshaller
+import akka.http.scaladsl.marshalling.ToEntityMarshaller
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import cats.MonadError
@@ -11,16 +11,18 @@ import scala.language.higherKinds
 
 trait PetClinicService[F[_]] {
 
-  implicit def fmarshaller[A, B](
-    implicit m1: Marshaller[A, B],
-    m2: Marshaller[PetClinicError, B]): Marshaller[F[A], B]
-  implicit val monadEv: MonadError[F, PetClinicError]
+  implicit def fmarshaller[A](
+    implicit ma: ToEntityMarshaller[A],
+    me: ToEntityMarshaller[PetClinicError]): ToEntityMarshaller[F[A]]
+  implicit def monadEv: MonadError[F, PetClinicError]
 
   def route(implicit petRepo: PetRepo[F], ownerRepo: OwnerRepo[F]): Route =
     pathPrefix("petTypes") {
       pathEndOrSingleSlash {
         get {
-          complete(petRepo.findPetTypes)
+          val petTypes = petRepo.findPetTypes
+          petTypes.ensure(PetClinicError(305, "Error Forzado para pruebas"))(_.length > 100)
+          complete(petTypes)
         }
       }
     } ~
