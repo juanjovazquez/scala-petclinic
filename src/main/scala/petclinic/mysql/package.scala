@@ -4,7 +4,7 @@ import cats.data.EitherT
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 import scala.util.control.NonFatal
-import java.sql.{ Connection, DriverManager, SQLException }
+import java.sql.{ Connection, DriverManager }
 
 package object mysql {
 
@@ -30,8 +30,4 @@ package object mysql {
         }
       comp.get
     })
-
-  object SQLException {
-    def apply(msg: String) = new SQLException(msg)
-  }
 }

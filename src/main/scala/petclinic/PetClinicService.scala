@@ -1,6 +1,6 @@
 package petclinic
 
-import akka.http.scaladsl.marshalling.ToEntityMarshaller
+import akka.http.scaladsl.marshalling.{ ToEntityMarshaller, ToResponseMarshaller }
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import cats.MonadError
@@ -13,15 +13,17 @@ trait PetClinicService[F[_]] {
 
   implicit def fmarshaller[A](
     implicit ma: ToEntityMarshaller[A],
-    me: ToEntityMarshaller[PetClinicError]): ToEntityMarshaller[F[A]]
+    me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[F[A]]
   implicit def monadEv: MonadError[F, PetClinicError]
 
   def route(implicit petRepo: PetRepo[F], ownerRepo: OwnerRepo[F]): Route =
     pathPrefix("petTypes") {
       pathEndOrSingleSlash {
         get {
-          val petTypes = petRepo.findPetTypes
-          petTypes.ensure(PetClinicError(305, "Error Forzado para pruebas"))(_.length > 100)
+          val petTypes =
+            petRepo
+              .findPetTypes
+              .ensure(PetClinicError(308, "Error Forzado para pruebas"))(_.length > 100)
           complete(petTypes)
         }
       }
@@ -33,7 +35,7 @@ trait PetClinicService[F[_]] {
             petRepo.findById(petId).flatMap { pet =>
               val owner   = ownerRepo.findById(pet.ownerId)
               val petType = petRepo.findPetTypeById(pet.petTypeId)
-              (petType, owner).map2((pt, ow) => PetInfo(pet, pt, Some(ow)))
+              (petType |@| owner).map((pt, ow) => PetInfo(pet, pt, Some(ow)))
             }
           complete(petInfo)
         }
@@ -74,7 +76,7 @@ trait PetClinicService[F[_]] {
         get {
           val owner     = ownerRepo.findById(ownerId)
           val pets      = petRepo.findPetsByOwnerId(ownerId)
-          val ownerInfo = (owner, pets).map2(OwnerInfo)
+          val ownerInfo = (owner |@| pets).map(OwnerInfo)
           complete(ownerInfo)
         }
       }

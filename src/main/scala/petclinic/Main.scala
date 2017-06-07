@@ -3,7 +3,7 @@ package petclinic
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.marshalling.ToEntityMarshaller
+import akka.http.scaladsl.marshalling.{ ToEntityMarshaller, ToResponseMarshaller }
 import cats.MonadError
 import cats.implicits._
 import petclinic.implicits._
@@ -24,7 +24,7 @@ object service {
     new PetClinicService[Response] {
       def fmarshaller[A](
         implicit ma: ToEntityMarshaller[A],
-        me: ToEntityMarshaller[PetClinicError]): ToEntityMarshaller[Response[A]] =
+        me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[Response[A]] =
         implicitly
       val monadEv: MonadError[Response, PetClinicError] = implicitly
     }
