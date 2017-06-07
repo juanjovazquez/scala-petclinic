@@ -12,7 +12,8 @@ import scala.language.higherKinds
 trait PetClinicService[F[_]] {
 
   implicit def fmarshaller[A, B](
-      implicit m: Marshaller[Either[PetClinicError, A], B]): Marshaller[F[A], B]
+    implicit m1: Marshaller[A, B],
+    m2: Marshaller[PetClinicError, B]): Marshaller[F[A], B]
   implicit val monadEv: MonadError[F, PetClinicError]
 
   def route(implicit petRepo: PetRepo[F], ownerRepo: OwnerRepo[F]): Route =
