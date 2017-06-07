@@ -3,7 +3,7 @@ package petclinic
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import cats.Monad
+import cats.MonadError
 import cats.implicits._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
@@ -13,7 +13,7 @@ trait PetClinicService[F[_]] {
 
   implicit def fmarshaller[A, B](
       implicit m: Marshaller[Either[PetClinicError, A], B]): Marshaller[F[A], B]
-  implicit val monadEv: Monad[F]
+  implicit val monadEv: MonadError[F, PetClinicError]
 
   def route(implicit petRepo: PetRepo[F], ownerRepo: OwnerRepo[F]): Route =
     pathPrefix("petTypes") {

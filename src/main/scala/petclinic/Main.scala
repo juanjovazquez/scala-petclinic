@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshaller
-import cats.Monad
+import cats.MonadError
 import cats.implicits._
 import petclinic.implicits._
 import scala.concurrent.ExecutionContext
@@ -25,6 +25,6 @@ object service {
       def fmarshaller[A, B](
           implicit m: Marshaller[Either[PetClinicError, A], B]): Marshaller[Response[A], B] =
         implicitly
-      val monadEv: Monad[Response] = implicitly
+      val monadEv: MonadError[Response, PetClinicError] = implicitly
     }
 }
