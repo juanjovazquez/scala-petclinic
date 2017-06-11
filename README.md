@@ -7,6 +7,7 @@ Basic example based on the well-known [Spring PetClinic](https://github.com/spri
 A docker compose file is provided in order to run the sample.
 
 ```bash
+> docker-compose up
 > mysql -h 127.0.0.1 -P 3306 -u root -p
 > mysql -h 127.0.0.1 -u root -p < src/main/resources/db/mysql/schema.sql
 > mysql petclinic -h 127.0.0.1 -u root -p < src/main/resources/db/mysql/data.sql
@@ -16,12 +17,15 @@ In case you are executing docker on docker machine, e.g. on Mac OS X, then execu
 
 ```bash
 > docker-machine start
+> docker-compose up
 > mysql -h $(docker-machine ip) -u root -p
 > mysql -h $(docker-machine ip) -u root -p < src/main/resources/db/mysql/schema.sql
 > mysql petclinic -h $(docker-machine ip) -u root -p < src/main/resources/db/mysql/data.sql
 ```
 
-And on another terminal:
+Once the data has been loaded, it is not necessary to reload them unless the container is deleted.
+
+On another terminal:
 
 ```bash
 > sbt run
