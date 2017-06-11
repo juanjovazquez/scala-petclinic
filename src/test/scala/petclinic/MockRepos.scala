@@ -1,57 +1,74 @@
 package petclinic
 
-import cats.data.State
-import cats.data.State.{ get, modify }
+import cats.data.{ EitherT, State }
+import cats.syntax.all._
 
 trait MockRepos extends Data {
 
-  type DBAction[A] = State[DB, A]
+  // the monad stack for testing
+  type DBAction[A] = EitherT[State[DB, ?], PetClinicError, A]
+  object DBAction {
+    def apply[A](s: State[DB, Either[PetClinicError, A]]): DBAction[A] =
+      EitherT[State[DB, ?], PetClinicError, A](s)
+  }
+
+  final val NotFoundStandardError = PetClinicError("Not Found", httpErrorCode = Some(404))
 
   implicit val petRepo: PetRepo[DBAction] =
     new PetRepo[DBAction] {
       def findById(id: Long): DBAction[Pet] =
-        get.map(_.pets(id))
+        inspect(_.pets.get(id).fold(NotFoundStandardError.asLeft[Pet])(_.asRight))
 
       def findPetTypes: DBAction[List[PetType]] =
-        get.map(_.petTypes.values.toList)
+        inspect(_.petTypes.values.toList.asRight)
 
       def findPetTypeById(petTypeId: Long): DBAction[PetType] =
-        get.map(_.petTypes(petTypeId))
+        inspect(_.petTypes.get(petTypeId).fold(NotFoundStandardError.asLeft[PetType])(_.asRight))
 
       def findPetsByOwnerId(ownerId: Long): DBAction[List[Pet]] =
-        get.map(_.pets.values.filter(_.ownerId == ownerId).toList)
+        inspect(_.pets.values.filter(_.ownerId == ownerId).toList.asRight)
 
       def save(pet: Pet): DBAction[Long] =
-        get.transform {
-          case (db, _) =>
+        DBAction {
+          State(db => {
             val genId = db.pets.keys.max + 1
-            (db.copy(pets = db.pets + (genId -> pet)), genId)
+            (db.copy(pets = db.pets + (genId -> pet)), genId.asRight)
+          })
         }
 
       def update(pet: Pet): DBAction[Unit] =
-        modify { db =>
-          db.copy(pets = db.pets + (pet.id.get -> pet))
+        DBAction {
+          State(db =>
+            (db.copy(pets = db.pets + (pet.id.get -> pet)), ().asRight))
         }
     }
 
   implicit val ownerRepo: OwnerRepo[DBAction] =
     new OwnerRepo[DBAction] {
       def findById(id: Long): DBAction[Owner] =
-        get.map(_.owners(id))
+        inspect(_.owners.get(id).fold(NotFoundStandardError.asLeft[Owner])(_.asRight))
 
       def findByLastName(lastName: String): DBAction[List[Owner]] =
         get.map(_.owners.values.filter(_.lastName == lastName).toList)
 
       def save(owner: Owner): DBAction[Long] =
-        get.transform {
-          case (db, _) =>
+        DBAction {
+          State(db => {
             val genId = db.owners.keys.max + 1
-            (db.copy(owners = db.owners + (genId -> owner)), genId)
+            (db.copy(owners = db.owners + (genId -> owner)), genId.asRight)
+          })
         }
 
       def update(owner: Owner): DBAction[Unit] =
-        modify { db =>
-          db.copy(owners = db.owners + (owner.id.get -> owner))
+        DBAction {
+          State(db =>
+            (db.copy(owners = db.owners + (owner.id.get -> owner)), ().asRight))
         }
     }
+
+  private def inspect[A](f: DB => Either[PetClinicError, A]): DBAction[A]  =
+    EitherT[State[DB, ?], PetClinicError, A](State.inspect(f))
+
+  private def get: DBAction[DB] =
+    EitherT.right[State[DB, ?], PetClinicError, DB](State.get)
 }

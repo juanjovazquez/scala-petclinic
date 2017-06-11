@@ -8,12 +8,16 @@ import scala.concurrent.Future
 case object implicits {
 
   implicit def eitherTMarshaller[A](
-    implicit ma: ToEntityMarshaller[A],
-    me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[EitherT[Future, PetClinicError, A]] =
+      implicit ma: ToEntityMarshaller[A],
+      me: ToEntityMarshaller[PetClinicError])
+    : ToResponseMarshaller[EitherT[Future, PetClinicError, A]] =
     Marshaller(implicit ec =>
       _.value.flatMap {
         case Right(a) => ma.map(me => HttpResponse(entity = me))(a)
-        case Left(e)  => me.map(me => HttpResponse(status = e.httpCode, entity = me))(e)
-      }
-    )
+        case Left(e)  => me.map(me =>
+          e.httpErrorCode.map(
+            code => HttpResponse(status = code, entity = me)
+          ).getOrElse(HttpResponse(entity = me))
+        )(e)
+    })
 }

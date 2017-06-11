@@ -15,7 +15,8 @@ final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo
       val resultSet = pst.executeQuery()
       resultSet.toEntity[Owner] match {
         case Some(owner) => Right(owner)
-        case None        => Left(PetClinicError(500, s"Owner with id: $id not found"))
+        case None        =>
+          Left(PetClinicError(s"Owner with id: $id not found", httpErrorCode = Some(404)))
       }
     }
 
@@ -29,8 +30,10 @@ final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo
       pst.setString(5, owner.telephone)
       pst.executeUpdate()
       val keys = pst.getGeneratedKeys
-      keys.next()
-      Right(keys.getLong(1)) // TODO Manage error
+      if (keys.next())
+        Right(keys.getLong(1))
+      else
+        Left(PetClinicError())
     }
 
   def update(owner: Owner): Response[Unit] =

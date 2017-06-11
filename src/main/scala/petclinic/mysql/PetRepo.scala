@@ -15,7 +15,8 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Res
       val resultSet = statement.executeQuery()
       resultSet.toEntity[Pet] match {
         case Some(pet) => Right(pet)
-        case None      => Left(PetClinicError(500, s"Pet with id: $id not found"))
+        case None      =>
+          Left(PetClinicError(s"Pet with id: $id not found", httpErrorCode = Some(404)))
       }
     }
 
@@ -28,8 +29,10 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Res
       pst.setLong(4, pet.ownerId)
       pst.executeUpdate()
       val keys = pst.getGeneratedKeys
-      keys.next()
-      Right(keys.getLong(1))
+      if (keys.next())
+        Right(keys.getLong(1))
+      else
+        Left(PetClinicError())
     }
 
   def update(pet: Pet): Response[Unit] =
@@ -50,7 +53,8 @@ final class PetRepo(implicit ec: ExecutionContext) extends petclinic.PetRepo[Res
       val resultSet = statement.executeQuery()
       resultSet.toEntity[PetType] match {
         case Some(petType) => Right(petType)
-        case None          => Left(PetClinicError(500, s"PetType with id $petTypeId not found"))
+        case None          =>
+          Left(PetClinicError(s"PetType with id $petTypeId not found", httpErrorCode = Some(404)))
       }
     }
 

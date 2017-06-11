@@ -23,8 +23,8 @@ object service {
   def apply()(implicit ec: ExecutionContext): PetClinicService[Response] =
     new PetClinicService[Response] {
       def fmarshaller[A](
-        implicit ma: ToEntityMarshaller[A],
-        me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[Response[A]] =
+          implicit ma: ToEntityMarshaller[A],
+          me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[Response[A]] =
         implicitly
       val monadEv: MonadError[Response, PetClinicError] = implicitly
     }

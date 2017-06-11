@@ -1,6 +1,9 @@
 package petclinic
 
-case class PetClinicError(httpCode: Int, msg: String)
+case class PetClinicError(
+  msg: String = "Not expected error",
+  httpErrorCode: Option[Int] = Some(500)
+)
 
 sealed abstract class BaseEntity extends Product with Serializable {
   def id: Option[Id]

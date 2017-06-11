@@ -12,8 +12,8 @@ import scala.language.higherKinds
 trait PetClinicService[F[_]] {
 
   implicit def fmarshaller[A](
-    implicit ma: ToEntityMarshaller[A],
-    me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[F[A]]
+      implicit ma: ToEntityMarshaller[A],
+      me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[F[A]]
   implicit def monadEv: MonadError[F, PetClinicError]
 
   def route(implicit petRepo: PetRepo[F], ownerRepo: OwnerRepo[F]): Route =
@@ -21,9 +21,8 @@ trait PetClinicService[F[_]] {
       pathEndOrSingleSlash {
         get {
           val petTypes =
-            petRepo
-              .findPetTypes
-              .ensure(PetClinicError(308, "Error Forzado para pruebas"))(_.length > 100)
+            petRepo.findPetTypes
+              //.ensure(PetClinicError(308, "Error Forzado para pruebas"))(_.length > 100)
           complete(petTypes)
         }
       }

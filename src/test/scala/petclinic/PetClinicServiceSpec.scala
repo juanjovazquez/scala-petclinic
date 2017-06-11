@@ -1,10 +1,12 @@
 package petclinic
 
-import akka.http.scaladsl.marshalling.Marshaller
+import akka.http.scaladsl.marshalling.{ ToEntityMarshaller, ToResponseMarshaller }
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.ContentTypes.`application/json`
-import cats.Monad
+import cats.MonadError
+import cats.data.State
+import cats.data.EitherT.catsDataMonadErrorForEitherT
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import org.scalatest.{ Matchers, WordSpec }
@@ -153,9 +155,12 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
       initialState: DB = initialDB
   )(onResponse: DB => Unit = _ => ()): PetClinicService[DBAction] =
     new PetClinicService[DBAction] {
-      def fmarshaller[A, B](implicit m: Marshaller[A, B]): Marshaller[DBAction[A], B] =
-        stateMarshaller(initialState)(onResponse)
-      val monadEv: Monad[DBAction] = implicitly
+      def fmarshaller[A](
+        implicit ma: ToEntityMarshaller[A],
+        me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[DBAction[A]] =
+        dbActionMarshaller(initialState)(onResponse)
+      def monadEv: MonadError[DBAction, PetClinicError] =
+        catsDataMonadErrorForEitherT[State[DB, ?], PetClinicError]
     }
 
   private[this] def checkResponseOk = {
