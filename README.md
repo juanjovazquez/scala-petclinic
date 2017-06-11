@@ -26,3 +26,11 @@ And on another terminal:
 ```bash
 > sbt run
 ```
+
+Some client requests: 
+
+```bash
+> curl http://localhost:8080/petTypes
+> curl http://localhost:8080/owner/1
+> curl http://localhost:8080/owner?lastName=Coleman
+```
