@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
   "de.heikoseeberger" %% "akka-http-circe"     % "1.15.0",
   "io.circe"          %% "circe-generic"       % "0.8.0",
   "org.typelevel"     %% "cats"                % "0.9.0",
-  "com.typesafe"      %  "config"              % "1.3.1",
+  "com.typesafe"      % "config"               % "1.3.1",
   "org.scalatest"     %% "scalatest"           % "3.0.1" % Test,
   "mysql"             % "mysql-connector-java" % "6.0.6" % Runtime
 )

@@ -38,8 +38,7 @@ trait MockRepos extends Data {
 
       def update(pet: Pet): DBAction[Unit] =
         DBAction {
-          State(db =>
-            (db.copy(pets = db.pets + (pet.id.get -> pet)), ().asRight))
+          State(db => (db.copy(pets = db.pets + (pet.id.get -> pet)), ().asRight))
         }
     }
 
@@ -61,12 +60,11 @@ trait MockRepos extends Data {
 
       def update(owner: Owner): DBAction[Unit] =
         DBAction {
-          State(db =>
-            (db.copy(owners = db.owners + (owner.id.get -> owner)), ().asRight))
+          State(db => (db.copy(owners = db.owners + (owner.id.get -> owner)), ().asRight))
         }
     }
 
-  private def inspect[A](f: DB => Either[PetClinicError, A]): DBAction[A]  =
+  private def inspect[A](f: DB => Either[PetClinicError, A]): DBAction[A] =
     EitherT[State[DB, ?], PetClinicError, A](State.inspect(f))
 
   private def get: DBAction[DB] =

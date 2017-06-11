@@ -55,7 +55,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
         status shouldBe StatusCodes.NotFound
         contentType shouldBe `application/json`
         val entity = entityAs[PetClinicError]
-        entity shouldBe a [PetClinicError]
+        entity shouldBe a[PetClinicError]
         val Some(errorCode) = entity.httpErrorCode
         errorCode shouldBe StatusCodes.NotFound.intValue
       }
@@ -112,7 +112,7 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
         status shouldBe StatusCodes.NotFound
         contentType shouldBe `application/json`
         val entity = entityAs[PetClinicError]
-        entity shouldBe a [PetClinicError]
+        entity shouldBe a[PetClinicError]
         val Some(errorCode) = entity.httpErrorCode
         errorCode shouldBe StatusCodes.NotFound.intValue
       }
@@ -178,8 +178,8 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
   )(onResponse: DB => Unit = _ => ()): PetClinicService[DBAction] =
     new PetClinicService[DBAction] {
       def fmarshaller[A](
-        implicit ma: ToEntityMarshaller[A],
-        me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[DBAction[A]] =
+          implicit ma: ToEntityMarshaller[A],
+          me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[DBAction[A]] =
         dbActionMarshaller(initialState)(onResponse)
       def monadEv: MonadError[DBAction, PetClinicError] =
         catsDataMonadErrorForEitherT[State[DB, ?], PetClinicError]

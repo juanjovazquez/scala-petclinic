@@ -14,10 +14,13 @@ case object implicits {
     Marshaller(implicit ec =>
       _.value.flatMap {
         case Right(a) => ma.map(me => HttpResponse(entity = me))(a)
-        case Left(e)  => me.map(me =>
-          e.httpErrorCode.map(
-            code => HttpResponse(status = code, entity = me)
-          ).getOrElse(HttpResponse(entity = me))
-        )(e)
+        case Left(e) =>
+          me.map(
+            me =>
+              e.httpErrorCode
+                .map(
+                  code => HttpResponse(status = code, entity = me)
+                )
+                .getOrElse(HttpResponse(entity = me)))(e)
     })
 }

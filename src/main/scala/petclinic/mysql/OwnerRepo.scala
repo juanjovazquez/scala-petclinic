@@ -15,7 +15,7 @@ final class OwnerRepo(implicit ec: ExecutionContext) extends petclinic.OwnerRepo
       val resultSet = pst.executeQuery()
       resultSet.toEntity[Owner] match {
         case Some(owner) => Right(owner)
-        case None        =>
+        case None =>
           Left(PetClinicError(s"Owner with id: $id not found", httpErrorCode = Some(404)))
       }
     }

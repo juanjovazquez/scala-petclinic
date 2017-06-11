@@ -12,7 +12,7 @@ package object mysql {
 
   final val Config = ConfigFactory.load()
 
-  final val Ip       =
+  final val Ip =
     Try("docker-machine ip".!!).orElse(Try(Config.getString("mysql.ip"))).getOrElse("localhost")
   final val Driver   = "com.mysql.jdbc.Driver"
   final val Url      = s"jdbc:mysql://$Ip/petclinic"

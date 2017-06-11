@@ -52,19 +52,19 @@ trait PetClinicService[F[_]] {
         get {
           parameter('lastName.?) { lastName =>
             val default = monadEv.pure(List.empty[Owner])
-            val owners = lastName.map(ownerRepo.findByLastName).getOrElse(default)
-              lastName match {
-                case Some(ln) =>
-                  complete {
-                    owners.ensure(
-                      PetClinicError(
-                        s"No owners found with lastName: $ln",
-                        Option(StatusCodes.NotFound.intValue)
-                      ))(_.nonEmpty)
-                  }
-                case None     =>
-                  complete(owners)
-              }
+            val owners  = lastName.map(ownerRepo.findByLastName).getOrElse(default)
+            lastName match {
+              case Some(ln) =>
+                complete {
+                  owners.ensure(
+                    PetClinicError(
+                      s"No owners found with lastName: $ln",
+                      Option(StatusCodes.NotFound.intValue)
+                    ))(_.nonEmpty)
+                }
+              case None =>
+                complete(owners)
+            }
           }
         } ~
         post {
