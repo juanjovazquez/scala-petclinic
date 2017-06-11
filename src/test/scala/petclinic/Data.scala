@@ -104,7 +104,8 @@ trait Data {
       10L -> Pet(10, "Mulligan", "1997-02-24", 2, 8),
       11L -> Pet(11, "Freddy", "2000-03-09", 5, 9),
       12L -> Pet(12, "Lucky", "2000-06-24", 2, 10),
-      13L -> Pet(13, "Sly", "2002-06-08", 1, 10)
+      13L -> Pet(13, "Sly", "2002-06-08", 1, 10),
+      14L -> Pet(14, "Boo", "2000-01-03", 3, 11)
     )
 
   val initialDB = DB(owners, petTypes, pets)

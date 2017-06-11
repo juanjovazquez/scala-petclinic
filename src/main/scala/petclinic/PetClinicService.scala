@@ -1,6 +1,7 @@
 package petclinic
 
 import akka.http.scaladsl.marshalling.{ ToEntityMarshaller, ToResponseMarshaller }
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import cats.MonadError
@@ -20,10 +21,7 @@ trait PetClinicService[F[_]] {
     pathPrefix("petTypes") {
       pathEndOrSingleSlash {
         get {
-          val petTypes =
-            petRepo.findPetTypes
-              //.ensure(PetClinicError(308, "Error Forzado para pruebas"))(_.length > 100)
-          complete(petTypes)
+          complete(petRepo.findPetTypes)
         }
       }
     } ~
@@ -54,8 +52,19 @@ trait PetClinicService[F[_]] {
         get {
           parameter('lastName.?) { lastName =>
             val default = monadEv.pure(List.empty[Owner])
-            val owners  = lastName.map(ownerRepo.findByLastName).getOrElse(default)
-            complete(owners)
+            val owners = lastName.map(ownerRepo.findByLastName).getOrElse(default)
+              lastName match {
+                case Some(ln) =>
+                  complete {
+                    owners.ensure(
+                      PetClinicError(
+                        s"No owners found with lastName: $ln",
+                        Option(StatusCodes.NotFound.intValue)
+                      ))(_.nonEmpty)
+                  }
+                case None     =>
+                  complete(owners)
+              }
           }
         } ~
         post {

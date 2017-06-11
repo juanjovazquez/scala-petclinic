@@ -50,6 +50,17 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
       }
     }
 
+    "return an error when the owner's pet doesn't exist" in {
+      Get("/pet/14") ~> service.route ~> check {
+        status shouldBe StatusCodes.NotFound
+        contentType shouldBe `application/json`
+        val entity = entityAs[PetClinicError]
+        entity shouldBe a [PetClinicError]
+        val Some(errorCode) = entity.httpErrorCode
+        errorCode shouldBe StatusCodes.NotFound.intValue
+      }
+    }
+
     "return an owner with its pets by id" in {
       Get("/owner/1") ~> service.route ~> check {
         checkResponseOk
@@ -93,6 +104,17 @@ class PetClinicServiceSpec extends WordSpec with Matchers with ScalatestRouteTes
             "6085553198"
           )
         )
+      }
+    }
+
+    "return an error when lastName produces no owners" in {
+      Get("/owner?lastName=Foo") ~> service.route ~> check {
+        status shouldBe StatusCodes.NotFound
+        contentType shouldBe `application/json`
+        val entity = entityAs[PetClinicError]
+        entity shouldBe a [PetClinicError]
+        val Some(errorCode) = entity.httpErrorCode
+        errorCode shouldBe StatusCodes.NotFound.intValue
       }
     }
 
