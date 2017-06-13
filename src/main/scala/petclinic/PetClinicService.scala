@@ -1,6 +1,7 @@
 package petclinic
 
-import akka.http.scaladsl.marshalling.{ ToEntityMarshaller, ToResponseMarshaller }
+import akka.event.LoggingAdapter
+import akka.http.scaladsl.marshalling.{ToEntityMarshaller, ToResponseMarshaller}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
@@ -8,6 +9,7 @@ import cats.MonadError
 import cats.implicits._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
+
 import scala.language.higherKinds
 
 trait PetClinicService[F[_]] {
@@ -16,12 +18,15 @@ trait PetClinicService[F[_]] {
       implicit ma: ToEntityMarshaller[A],
       me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[F[A]]
   implicit def monadEv: MonadError[F, PetClinicError]
+  implicit def logger: Logger[F, LoggingAdapter]
 
   def route(implicit petRepo: PetRepo[F], ownerRepo: OwnerRepo[F]): Route =
     pathPrefix("petTypes") {
       pathEndOrSingleSlash {
         get {
-          complete(petRepo.findPetTypes)
+          extractLog { implicit log =>
+            complete(logger.info("Finding all pet types") >> petRepo.findPetTypes)
+          }
         }
       }
     } ~

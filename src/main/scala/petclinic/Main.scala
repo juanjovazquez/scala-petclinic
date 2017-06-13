@@ -1,12 +1,14 @@
 package petclinic
 
 import akka.actor.ActorSystem
+import akka.event.LoggingAdapter
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.marshalling.{ ToEntityMarshaller, ToResponseMarshaller }
+import akka.http.scaladsl.marshalling.{ToEntityMarshaller, ToResponseMarshaller}
 import cats.MonadError
 import cats.implicits._
 import petclinic.implicits._
+
 import scala.concurrent.ExecutionContext
 
 object Main {
@@ -27,5 +29,6 @@ object service {
           me: ToEntityMarshaller[PetClinicError]): ToResponseMarshaller[Response[A]] =
         implicitly
       val monadEv: MonadError[Response, PetClinicError] = implicitly
+      val logger: Logger[Response, LoggingAdapter] = implicitly
     }
 }
